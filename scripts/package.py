@@ -16,7 +16,7 @@ SKIP = {".git", ".godot", ".godot_rust_home", "target", "build", "dist", "__pyca
 
 def archive(output, base, files, file_mode=None):
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
-        for path in sorted(files):
+        for path in sorted(files, key=lambda item: item.relative_to(base).as_posix()):
             info = zipfile.ZipInfo(path.relative_to(base).as_posix(), (1980, 1, 1, 0, 0, 0))
             info.create_system = 3
             info.external_attr = ((file_mode or path.stat().st_mode) & 0xFFFF) << 16

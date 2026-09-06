@@ -31,3 +31,21 @@ jobs:
             build/store-validation/*.log
             build/store-validation/result.json
             dist/store/*
+  reproducibility:
+    needs: export
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: store-validation-*
+          path: results
+      - name: Compare archives from native Windows and Linux runners
+        shell: python
+        run: |
+          import hashlib
+          from pathlib import Path
+          archives = list(Path('results').rglob('godot-game-stream-0.1.0-desktop.zip'))
+          assert len(archives) == 2, archives
+          checksums = {hashlib.sha256(path.read_bytes()).hexdigest() for path in archives}
+          assert len(checksums) == 1, checksums
+          print('Identical desktop archive on both runners:', checksums.pop())
