@@ -99,7 +99,16 @@ def package_client(archive, target="macos-arm64"):
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(obj, dest)
     link_file = objects / "mirctl.dir/link.txt"
-    link = link_file.read_text()
+    if link_file.is_file():
+        link = link_file.read_text()
+    else:
+        # NMake embeds the link command in build.make instead of generating link.txt.
+        make_file = objects / "mirctl.dir/build.make"
+        commands = [line.strip() for line in make_file.read_text().splitlines() if " -E vs_link_exe " in line]
+        if len(commands) != 1:
+            raise ValueError("Cannot identify the NMake executable link command")
+        link = commands[0].replace("$(CMAKE_COMMAND)", "cmake") + "\n"
+        shutil.copy2(make_file, dependencies / "objects/mirctl.dir/build.make")
     for node in nodes:
         if node.get("package_folder"):
             link = link.replace(node["package_folder"], f'$DEPENDENCIES/static-libraries/{node["name"]}')
