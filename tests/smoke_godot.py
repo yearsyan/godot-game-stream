@@ -15,15 +15,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--godot", type=Path, required=True)
+    launch = parser.add_mutually_exclusive_group(required=True)
+    launch.add_argument("--godot", type=Path)
+    launch.add_argument("--executable", type=Path, help="Run an exported copy of the demo")
+    parser.add_argument("--project", type=Path, default=ROOT)
+    parser.add_argument("--output", type=Path, default=ROOT / "build/smoke")
     parser.add_argument("--ffprobe", default=shutil.which("ffprobe"))
     args = parser.parse_args()
     if not args.ffprobe:
         parser.error("ffprobe is required for independent decoder validation")
-    output = ROOT / "build/smoke"
+    output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     (ROOT / "build/.gdignore").touch()
-    command = [str(args.godot.resolve()), "--path", str(ROOT)]
+    command = [str(args.executable.resolve())] if args.executable else [str(args.godot.resolve()), "--path", str(args.project.resolve())]
     if sys.platform == "darwin":
         command += ["--rendering-driver", "metal"]
     command += ["--", "--smoke"]

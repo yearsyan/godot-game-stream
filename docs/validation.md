@@ -44,11 +44,14 @@ python3 tests/smoke_editor.py --godot /path/to/official/godot
 - The maintainer reports Windows/Linux streaming validation in GachaGameProducer.
   Supplemental standalone builds have separate native CI and loader checks;
   hosted CI does not exercise the hardware encoder. See [desktop releases](desktop-releases.md).
-- Exported-game runtime dependency placement and public macOS signing/notarization
-  still need release validation. The current addon build is locally ad-hoc signed.
+- Fresh store-package installation and relocated release-export native loading
+  now pass on Windows, Linux and macOS. A macOS export also passes H.264 video
+  and remote input checks. See [store validation](../store/validation.md).
+- Public macOS signing/notarization is not included. The current addon build is
+  locally ad-hoc signed.
 - The v0.1.0 release packager collects client Conan source/license/rebuild
-  materials, including original application objects for relinking. Export and
-  other-platform runtime validation remain separate work.
+  materials, including original application objects for relinking. Windows/Linux
+  exported hardware streaming remains a target-GPU check beyond hosted CI.
 
 Reproduce the video/input check with:
 

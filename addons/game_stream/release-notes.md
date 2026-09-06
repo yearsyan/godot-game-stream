@@ -58,8 +58,13 @@ add a GameStreamHost node and enable Auto Start. Run the game and connect with
 
 ## Limits and remaining validation
 
-The release is for editor-launched games. Exported-game dependency placement and
-runtime validation remain pending. The macOS binaries are ad-hoc signed and are
+The original release was validated with editor-launched games. Subsequent store
+preparation verifies fresh installation and native dependency loading in
+relocated release exports on all three platforms, plus actual H.264 streaming
+and remote mouse input in a macOS export. Windows/Linux hardware streaming in
+exported games still needs target-GPU validation; hosted CI checks loading only.
+See the repository's `store/validation.md` for evidence and reproduction steps.
+The macOS binaries are ad-hoc signed and are
 not Developer ID signed or notarized. These are not claims of an App Store or
 Godot Asset Store approval; no store submission is included in this release.
 

@@ -9,12 +9,17 @@ The Godot upload contains `addons/game_stream/` only. mirctl is a separate
 platform-specific download in the same repository's Releases. Never upload the
 whole monorepo as the plugin installation payload.
 
-Before submitting a version, validate official Godot and exported games for every
-claimed platform/renderer, include license texts and dependency/source materials,
-and prepare an English description, icon, screenshot/video and changelog.
-Set the minimum version to 4.6 only after testing that version; the current API
-target alone is not proof of runtime compatibility. Record AI usage in the store's
-required disclosure field when applicable.
+The prepared store release uses the combined desktop ZIP assembled by
+`python3 scripts/package_store.py`. It contains three platform library entries,
+their runtime dependencies, notices, exact source links and a runnable example.
+The input archives and checksums are pinned in `store/package-inputs.json`.
+English listing fields and AI disclosure are in `store/listing.md`; thumbnail,
+icon and an actual streamed screenshot are in `store/media/`.
+
+The tested minimum is Godot 4.6.2 standard precision. The API target alone is not
+proof of compatibility. See `store/validation.md` for fresh installation,
+relocated export loading and the exact hardware streaming scope. Publish only
+the platforms/renderers covered by these claims.
 
 The LGPL-2.1-or-later declaration applies to first-party source and assets.
 Keep the exact third-party license and source notices with each binary package.

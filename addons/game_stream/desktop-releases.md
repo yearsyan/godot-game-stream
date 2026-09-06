@@ -29,8 +29,10 @@ The maintainer reports Windows and Linux streaming validation in GachaGameProduc
 The supplemental standalone packages are built on GitHub's native Windows 2022
 and Ubuntu 22.04 runners. Release checks include Rust tests/Clippy, C protocol
 fixtures, FFmpeg license/encoder inventory, dependency loading and a paced Godot
-editor smoke check. Hosted runners do not validate hardware video encoding or
-an exported game; those checks require the target GPU and driver.
+editor smoke check. The separate Store package validation workflow also exports
+a release application and checks native loading after moving it to another
+directory. Hosted runners do not validate hardware video encoding; that requires
+the target GPU and driver.
 
 The original v0.1.0 tag and macOS assets remain unchanged. Supplemental build
 records identify the newer source commit used for the desktop packaging changes.

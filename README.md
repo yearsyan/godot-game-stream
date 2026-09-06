@@ -39,8 +39,8 @@ The default listener is loopback; use a trusted tunnel for remote access.
 
 ## Install and run
 
-1. Download `godot-game-stream-0.1.0-<platform>.zip` for `windows-x86_64`,
-   `linux-x86_64` or `macos-arm64` from
+1. Download `godot-game-stream-0.1.0-desktop.zip` for all supported desktop
+   platforms, or a platform-specific `godot-game-stream-0.1.0-<platform>.zip`, from
    [Releases](https://github.com/yearsyan/godot-game-stream/releases/tag/v0.1.0)
    and extract its `addons/`
    directory into your Godot project. A source checkout requires a native build.
@@ -57,6 +57,11 @@ with the client; inspect `get_stats()["active_codec"]` and select that codec.
 The host captures the root viewport without resizing the game's window. Requested
 dimensions are clamped to the source and rounded down to even sizes. Only one host
 can own the singleton stream at a time. Streaming never starts inside the editor.
+
+The combined desktop archive includes `addons/game_stream/example/demo.tscn`.
+Open and run that scene to try streaming without setting up another scene.
+See [store package validation](store/validation.md) for fresh-install and
+relocated export checks, including actual macOS export streaming.
 
 For direct script control, attach `addons/game_stream/host.gd` to a Node and call
 `start_stream()`, `stop_stream()` and `get_stats()`. `start_stream()` returning `OK`

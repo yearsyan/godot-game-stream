@@ -14,12 +14,12 @@ ROOT = Path(__file__).resolve().parents[1]
 SKIP = {".git", ".godot", ".godot_rust_home", "target", "build", "dist", "__pycache__", ".cargo"}
 
 
-def archive(output, base, files):
+def archive(output, base, files, file_mode=None):
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as bundle:
         for path in sorted(files):
             info = zipfile.ZipInfo(path.relative_to(base).as_posix(), (1980, 1, 1, 0, 0, 0))
             info.create_system = 3
-            info.external_attr = (path.stat().st_mode & 0xFFFF) << 16
+            info.external_attr = ((file_mode or path.stat().st_mode) & 0xFFFF) << 16
             info.compress_type = zipfile.ZIP_DEFLATED
             with path.open("rb") as source, bundle.open(info, "w") as target:
                 shutil.copyfileobj(source, target)

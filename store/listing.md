@@ -96,8 +96,9 @@ platform's exact native build.
 AI assistance was used for code, documentation, packaging, tests and listing
 materials. The maintainer reports native Windows and Linux application testing;
 automated checks and macOS streaming checks are recorded in the repository.
-The demonstration image is decoded from an actual H.264 stream from the bundled
-Godot example. The thumbnail is generated from editable vector artwork.
+The demonstration image is decoded from an actual H.264 stream from a release
+export of the bundled Godot example. The thumbnail is generated from editable
+vector artwork.
 
 ## Version changelog
 

@@ -2,12 +2,19 @@
 
 LGPL-2.1-or-later · v0.1.0 · Windows x86_64 / Linux x86_64 / macOS arm64
 
-Use the archive matching your operating system. The addon targets Godot 4.6.2
+Use the combined desktop archive or the archive matching your operating system.
+The combined archive includes a runnable `example/demo.tscn` scene and exact
+native source links in `SOURCES.md`. The addon targets Godot 4.6.2
 standard precision and Forward+. Windows/Linux use NVENC, AMF or QSV; macOS
 26.0+ arm64 uses VideoToolbox. H.264 over TCP is the default. Windows/Linux
 streaming was validated by the maintainer in GachaGameProducer; the standalone
 desktop artifacts undergo native builds, tests and dependency loading checks.
 See `release-notes.md` and `desktop-releases.md` for requirements and scope.
+
+Fresh installation and relocated release-export dependency checks pass on all
+three platforms. A macOS export also passes H.264 streaming and remote mouse
+input checks. Windows/Linux exported hardware streaming needs validation with
+the target GPU; the hosted export checks exercise native library loading.
 
 Install this entire folder under `addons/`, enable **Godot Game Stream** in
 Project Settings → Plugins, and add a **GameStreamHost** node to a scene.

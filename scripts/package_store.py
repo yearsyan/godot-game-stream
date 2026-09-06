@@ -71,15 +71,22 @@ def merge_packages(inputs, cache, destination):
     for name in re.findall(r'"\./([^"\n]+)"', manifest):
         if not (destination / PREFIX / name).is_file():
             raise ValueError(f"Manifest references a missing file: {name}")
-    (destination / PREFIX / "game_stream.gdextension").write_text(manifest, encoding="utf-8")
+    (destination / PREFIX / "game_stream.gdextension").write_text(manifest, encoding="utf-8", newline="\n")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache", type=Path, default=ROOT / "build/store-inputs")
     parser.add_argument("--output", type=Path, default=ROOT / "dist/store")
+    parser.add_argument("--release", action="store_true", help="Also create matching source and build records from a clean commit")
     args = parser.parse_args()
+    if args.release and subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip():
+        parser.error("Commit source changes before generating release source materials")
     inputs = json.loads((ROOT / "store/package-inputs.json").read_text())
+    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    source_name = f'godot-game-stream-{inputs["version"]}-store-source.zip'
+    inputs["packaging_source"] = {"commit": revision,
+                                  "url": f'https://github.com/yearsyan/godot-game-stream/releases/download/v{inputs["version"]}/{source_name}'}
     args.cache.mkdir(parents=True, exist_ok=True)
     args.output.mkdir(parents=True, exist_ok=True)
     for platform in inputs["platforms"]:
@@ -106,8 +113,8 @@ def main():
         for name in ("demo.gd", "demo.tscn"):
             text = (ROOT / "examples" / name).read_text(encoding="utf-8")
             text = text.replace("res://examples/", "res://addons/game_stream/example/")
-            (example / name).write_text(text, encoding="utf-8")
-        (addon / "distribution.json").write_text(json.dumps(inputs, indent=2) + "\n", encoding="utf-8")
+            (example / name).write_text(text, encoding="utf-8", newline="\n")
+        (addon / "distribution.json").write_text(json.dumps(inputs, indent=2) + "\n", encoding="utf-8", newline="\n")
         sources = ["# Corresponding sources", "", "This installation archive combines the unchanged native binaries from the following release builds.",
                    "Shared documentation, the manifest and the bundled example are assembled from the standalone repository.",
                    "Each platform's exact source archives, build records and dependency sources are freely available at the links below.", ""]
@@ -115,13 +122,21 @@ def main():
             sources += [f'## {platform["platform"]}', "", f'Source commit: `{platform["source_commit"]}`', ""]
             sources += [f'- [{a["name"]}]({a["url"]})' for a in platform["assets"]]
             sources.append("")
-        sources += ["Shared packaging and example source: [repository](https://github.com/yearsyan/godot-game-stream).",
+        sources += [f'Shared packaging and example source: [{source_name}]({inputs["packaging_source"]["url"]}).',
+                    f'Packaging source commit: `{revision}`.',
                     "SHA-256 values for all inputs are recorded in `distribution.json`.", ""]
-        (addon / "SOURCES.md").write_text("\n".join(sources), encoding="utf-8")
+        (addon / "SOURCES.md").write_text("\n".join(sources), encoding="utf-8", newline="\n")
         output = args.output / f'godot-game-stream-{inputs["version"]}-desktop.zip'
-        archive(output, stage, (p for p in stage.rglob("*") if p.is_file()))
+        archive(output, stage, (p for p in stage.rglob("*") if p.is_file()), file_mode=0o100644)
     checksum = sha256(output)
     (args.output / (output.name + ".sha256")).write_text(f"{checksum}  {output.name}\n")
+    if args.release:
+        source = args.output / source_name
+        names = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
+        archive(source, ROOT, (ROOT / name for name in names if name), file_mode=0o100644)
+        record = {"version": inputs["version"], "packaging_commit": revision, "native_inputs": inputs["platforms"],
+                  "asset_sha256": {output.name: checksum, source.name: sha256(source)}}
+        (args.output / "store-build.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps({"path": str(output), "sha256": checksum, "bytes": output.stat().st_size}, indent=2))
 
 

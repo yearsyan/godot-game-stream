@@ -31,6 +31,7 @@ def main():
                         help="Extracted official 4.6.2 standard templates directory")
     parser.add_argument("--package", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=ROOT / "build/store-validation")
+    parser.add_argument("--stream", action="store_true", help="Exercise actual encoding and remote input on a GPU host")
     args = parser.parse_args()
     work = args.output.resolve()
     work.mkdir(parents=True, exist_ok=True)
@@ -49,7 +50,14 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 enabled=PackedStringArray("res://addons/game_stream/plugin.cfg")
 [rendering]
 renderer/rendering_method="forward_plus"
+textures/vram_compression/import_etc2_astc=true
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
 ''')
+    if args.stream:
+        config = project / "project.godot"
+        config.write_text(config.read_text().replace("res://probe.tscn", "res://addons/game_stream/example/demo.tscn"))
     (project / "probe.gd").write_text('''extends Node
 func _ready() -> void:
     if not Engine.has_singleton("GameStream"):
@@ -86,7 +94,7 @@ export_path=""
 script_export_mode=2
 [preset.0.options]
 custom_template/release={json.dumps(template.as_posix())}
-binary_format/architecture="{'arm64' if target == 'macos' else 'x86_64'}"
+binary_format/architecture="{'universal' if target == 'macos' else 'x86_64'}"
 application/bundle_identifier="org.godotgamestream.exportcheck"
 application/min_macos_version_arm64="26.0"
 codesign/codesign=1
@@ -110,12 +118,18 @@ codesign/identity="-"
         executable.chmod(0o755)
     # Hide the source project to rule out accidental loading from its bin directory.
     project.rename(work / "source-project-after-export")
-    text = run([executable, "--headless"], work / "runtime.log", env)
-    if "GAME_STREAM_EXPORTED_LIBRARY_OK" not in text:
-        raise RuntimeError("The exported application did not confirm the native singleton")
+    if args.stream:
+        subprocess.run([sys.executable, str(ROOT / "tests/smoke_godot.py"), "--executable", str(executable),
+                        "--output", str(work / "stream")], env=env, check=True)
+    else:
+        text = run([executable, "--headless"], work / "runtime.log", env)
+        if "GAME_STREAM_EXPORTED_LIBRARY_OK" not in text:
+            raise RuntimeError("The exported application did not confirm the native singleton")
     record = {"platform": target, "godot": "4.6.2", "package_sha256": hashlib.sha256(args.package.read_bytes()).hexdigest(),
               "fresh_editor_import": "passed", "relocated_release_export_native_loading": "passed",
               "hardware_encoding": "not exercised by this dependency check"}
+    if args.stream:
+        record["hardware_encoding"] = json.loads((work / "stream/result.json").read_text())
     (work / "result.json").write_text(json.dumps(record, indent=2) + "\n")
     print(json.dumps(record, indent=2))
 
