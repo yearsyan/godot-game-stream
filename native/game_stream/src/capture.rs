@@ -621,7 +621,7 @@ fn nv12_push_constant_bytes(width: u32, height: u32, row_stride: u32) -> [u8; 16
     let uv_offset = row_stride * height;
     let values = [width, height, row_stride / 4, uv_offset / 4];
     let mut bytes = [0_u8; 16];
-    for (chunk, value) in bytes.chunks_exact_mut(4).zip(values) {
+    for (chunk, value) in bytes.as_chunks_mut::<4>().0.iter_mut().zip(values) {
         chunk.copy_from_slice(&value.to_le_bytes());
     }
     bytes
@@ -1329,8 +1329,11 @@ mod tests {
     fn nv12_push_constants_match_shader_layout() {
         let bytes = nv12_push_constant_bytes(1918, 1080, 1920);
         let values: Vec<u32> = bytes
-            .chunks_exact(4)
-            .map(|chunk| u32::from_le_bytes(chunk.try_into().expect("four bytes")))
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .copied()
+            .map(u32::from_le_bytes)
             .collect();
         assert_eq!(values, [1918, 1080, 480, 518_400]);
     }
