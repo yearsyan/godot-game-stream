@@ -1,6 +1,11 @@
 # Godot Game Stream
 
-LGPL-2.1-or-later · Godot 4.6+ · Desktop hardware encoding
+LGPL-2.1-or-later · v0.1.0 · macOS arm64
+
+This binary release targets macOS 26.0+, Godot 4.6.2 standard precision and
+Forward+ with Metal. H.264 over TCP with VideoToolbox encoding is the supported
+configuration. The release was tested on macOS 26.6.2. Other platforms, renderers,
+Godot versions and codecs are experimental. See `release-notes.md`.
 
 Install this entire folder under `addons/`, enable **Godot Game Stream** in
 Project Settings → Plugins, and add a **GameStreamHost** node to a scene.
@@ -15,7 +20,7 @@ The native extension and FFmpeg runtime libraries in `bin/` are required.
 Source checkouts do not contain these generated files; build with the root
 repository's `scripts/build.py`. No custom Godot engine or .NET is required.
 
-Requires Forward+ or Mobile, a supported hardware encoder and a rendered root
+Requires a supported hardware encoder and a rendered root
 viewport. Compatibility, headless rendering, audio and mobile exports are not
 supported by this release. There is no x264 software fallback. TCP is supported
 by mirctl; the native UDP sender is experimental and needs another client.

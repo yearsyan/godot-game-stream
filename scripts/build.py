@@ -84,7 +84,7 @@ def relocate_macos(folder):
 def write_manifest():
     configs = sorted((ADDON / "bin").glob("*/*/platform.json"))
     lines = ['[configuration]', 'entry_symbol = "gdext_rust_init"',
-             'compatibility_minimum = "4.6"', 'reloadable = false', '', '[libraries]']
+             'compatibility_minimum = "4.6.2"', 'reloadable = false', '', '[libraries]']
     dependencies = []
     for config in configs:
         item = json.loads(config.read_text())

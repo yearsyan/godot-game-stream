@@ -138,6 +138,7 @@ def main() -> int:
     )
     ap.add_argument("--offline", action="store_true", help="Use only the local Conan cache")
     ap.add_argument("--skip-conan", action="store_true", help="Skip Conan install")
+    ap.add_argument("--lockfile", type=Path, help="Resolve dependencies from a Conan lockfile")
     args = ap.parse_args()
 
     build_type = "Release" if args.build_type == "release" else "Debug"
@@ -146,12 +147,17 @@ def main() -> int:
         msvc_profile = write_ffmpeg_msvc_profile(activate_msvc())
 
     if not args.skip_conan:
+        (ROOT / "build").mkdir(exist_ok=True)
         conan_command = [
             "conan", "install", ".",
             "--build=missing",
             "-s:h", f"build_type={build_type}",
             "-c:h", "tools.cmake.cmaketoolchain:generator=Ninja",
+            "--lockfile-out", str(ROOT / "build/conan.lock"),
+            "--format=json", "--out-file", str(ROOT / "build/conan-graph.json"),
         ]
+        if args.lockfile:
+            conan_command.extend(["--lockfile", str(args.lockfile.resolve())])
         if args.offline:
             conan_command.append("--no-remote")
         if sys.platform == "win32":

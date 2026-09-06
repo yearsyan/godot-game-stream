@@ -78,6 +78,7 @@ game, and on a host without the SDK on its library search path.
 python3 clients/mirctl/scripts/build.py
 # If all Conan dependencies are cached:
 python3 clients/mirctl/scripts/build.py --offline
+python3 clients/mirctl/scripts/build.py --lockfile /path/to/conan.lock
 ctest --test-dir clients/mirctl/build/app/Release --output-on-failure
 ```
 
@@ -86,18 +87,27 @@ is decoder-only and disables x264, x265, postproc and nonfree codec dependencies
 FFmpeg, SDL3 and the Windows CRT are statically linked. Keep the corresponding
 Conan recipe revisions, complete dependency sources, licenses and build instructions
 with client binary releases so recipients can rebuild/relink modified libraries.
-The local `dist/mirctl` executable alone is not a complete public distribution.
+The build records its resolved graph and lockfile under `clients/mirctl/build/`.
+The release packaging step collects the exact dependency sources, recipes,
+static libraries, application objects and notices. See
+[client rebuilding](client-rebuilding.md). The local `dist/mirctl` executable
+alone is not a complete public distribution.
 
 ## Addon ZIP
 
 ```sh
 cargo vendor --locked --manifest-path native/game_stream/Cargo.toml build/rust-vendor
-python3 scripts/package.py --ffmpeg-source /exact/source/used/for/sdk
+python3 scripts/package.py --ffmpeg-source /exact/source/used/for/sdk --client
 ```
 
-This produces an addon-only ZIP, first-party source ZIP, FFmpeg and Rust dependency source ZIPs, and
-checksums under `dist/`. Publish all four ZIPs together, with the matching
-configure/build records. When merging binaries from multiple machines, use the
-same FFmpeg source revision and collect each machine's build records and any
-patches. External third-party libraries need their own corresponding notices and
-source material; the minimal macOS SDK has no external codec dependencies.
+Commit the final source before packaging. Version 0.1.0 packages macOS arm64
+only and rejects other platform manifests. It produces an addon ZIP, a client
+ZIP, first-party/FFmpeg/Rust/client-dependency source materials, a build record
+and checksums under `dist/`. Publish the six ZIPs, `release-build.json` and
+`SHA256SUMS` together. The first-party source ZIP includes only tracked files
+from the recorded source commit. Client dependency downloads are verified
+against the SHA-256 values in the resolved Conan recipes.
+
+The package release target is macOS 26.0+, Godot 4.6.2 and Forward+ with Metal.
+See the [release notes](https://github.com/yearsyan/godot-game-stream/blob/v0.1.0/docs/releases/0.1.0.md)
+for validated scope and pending work.

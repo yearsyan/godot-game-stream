@@ -4,6 +4,11 @@ LGPL-2.1-or-later desktop client for Godot Game Stream. Pure C11, FFmpeg 9.0.1,
 SDL3 3.4.14. Receives raw H.264/HEVC/AV1 over TCP and sends GSI1 keyboard/mouse
 events back over the same connection. No audio, recording or Android device layer.
 
+The v0.1.0 binary download targets macOS 26.0+ on Apple Silicon (arm64), tested
+on macOS 26.6.2. Use it with Godot 4.6.2, Forward+ with Metal and the H.264 host
+configuration. The included executable is ad-hoc signed and not notarized.
+Other operating systems and codecs require separate release validation.
+
 ```sh
 python3 scripts/build.py
 python3 scripts/build.py --offline   # previously cached Conan dependencies

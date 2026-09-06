@@ -44,8 +44,9 @@ python3 tests/smoke_editor.py --godot /path/to/official/godot
 - Windows/Linux builds and driver combinations have not been validated here.
 - Exported-game runtime dependency placement and public macOS signing/notarization
   still need release validation. The current addon build is locally ad-hoc signed.
-- Client executable is a local build. Public client releases also need complete
-  Conan dependency source/license/rebuild materials as described in building.md.
+- The v0.1.0 release packager collects client Conan source/license/rebuild
+  materials, including original application objects for relinking. Export and
+  other-platform runtime validation remain separate work.
 
 Reproduce the video/input check with:
 

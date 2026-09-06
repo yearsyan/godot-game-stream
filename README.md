@@ -16,11 +16,16 @@ Third-party components retain their own licenses; see [THIRD_PARTY.md](THIRD_PAR
 - Latest-frame queues, keyframe recovery and runtime statistics.
 - Native C client with FFmpeg decoding and SDL3 rendering.
 
-This version requires **Godot 4.6+**, standard precision and a RenderingDevice
-renderer (Forward+ or Mobile). Compatibility and `--headless` cannot capture.
-The validated editor target is **Godot 4.6.2 standard**; see
+The **v0.1.0 binary release** targets **macOS 26.0+ on Apple Silicon (arm64)**,
+**Godot 4.6.2 standard precision**, and **Forward+ with Metal**. H.264 over TCP
+with VideoToolbox encoding is the supported configuration. It was tested on
+macOS 26.6.2; older macOS versions need separately targeted builds.
+See [release notes](docs/releases/0.1.0.md) and
 [validation results and the headless import caveat](docs/validation.md).
-Only publish platform/renderer combinations that have passed runtime validation.
+
+Other platforms, Godot versions, renderers and codecs remain experimental for
+this release. The source also supports the RenderingDevice Mobile renderer;
+Compatibility and `--headless` cannot capture.
 Desktop backends are NVENC/AMF/QSV on Windows/Linux and VideoToolbox on macOS.
 The LGPL distribution has **no x264 software fallback**: a working hardware encoder
 is required. macOS encoding supports H.264/HEVC; AV1 requires another supported
@@ -29,11 +34,14 @@ The default listener is loopback; use a trusted tunnel for remote access.
 
 ## Install and run
 
-1. Obtain an addon ZIP built for your OS/architecture and extract its `addons/`
+1. Download `godot-game-stream-0.1.0-macos-arm64.zip` from
+   [Releases](https://github.com/yearsyan/godot-game-stream/releases/tag/v0.1.0)
+   and extract its `addons/`
    directory into your Godot project. A source checkout requires a native build.
 2. Enable **Godot Game Stream** in Project Settings → Plugins.
 3. Add a **GameStreamHost** node to your scene and enable **Auto Start**.
-4. Run the game, then run `mirctl 127.0.0.1:20831` on the same machine.
+4. Download and extract `mirctl-0.1.0-macos-arm64.zip` from the same release.
+   Run the game, then run `./mirctl 127.0.0.1:20831` on the same machine.
 
 Both sides default to H.264. If you select HEVC or AV1 in the host inspector,
 pass the same `--codec=hevc` or `--codec=av1` to mirctl. `auto` does not negotiate

@@ -4,6 +4,8 @@
 #include "mirctl.h"
 
 #include <errno.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +16,7 @@ static void mc_usage(const char* program) {
     printf("Usage: %s [--no-control] [--codec=h264|hevc|av1] [HOST[:PORT]]\n", program);
     printf("       %s [--no-control] [--codec=h264|hevc|av1] [[IPv6]:PORT]\n", program);
     printf("Default endpoint: 127.0.0.1:%d, default codec: h264\n", MC_DEFAULT_PORT);
+    printf("Use --version to show the version and FFmpeg license.\n");
 }
 
 static bool mc_parse_port(const char* text, uint16_t* port) {
@@ -91,6 +94,12 @@ int main(int argc, char** argv) {
 
     for (int index = 1; index < argc; ++index) {
         const char* argument = argv[index];
+        if (!strcmp(argument, "--version")) {
+            printf("mirctl 0.1.0\nFFmpeg %s\nFFmpeg license: %s\n",
+                   av_version_info(),
+                   avcodec_license());
+            return 0;
+        }
         if (!strcmp(argument, "--help") || !strcmp(argument, "-h")) {
             mc_usage(argv[0]);
             return 0;

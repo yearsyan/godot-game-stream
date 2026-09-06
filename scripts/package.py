@@ -3,13 +3,15 @@
 """Create an addon-only ZIP and a matching first-party source ZIP."""
 import argparse
 import hashlib
+import json
 from pathlib import Path
 import shutil
+import subprocess
 import tomllib
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-SKIP = {".git", ".godot", "target", "build", "dist", "__pycache__", ".cargo"}
+SKIP = {".git", ".godot", ".godot_rust_home", "target", "build", "dist", "__pycache__", ".cargo"}
 
 
 def archive(output, base, files):
@@ -29,7 +31,11 @@ def main():
                         help="Exact source used for every included FFmpeg binary (one SDK version per package)")
     parser.add_argument("--rust-vendor", type=Path, default=ROOT / "build/rust-vendor",
                         help="Dependency sources created by cargo vendor --locked")
+    parser.add_argument("--client", action="store_true", help="Include the macOS client and its dependency materials")
     args = parser.parse_args()
+    if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip():
+        parser.error("Commit all source changes before packaging a release")
+    revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     source = args.ffmpeg_source.resolve()
     vendor = args.rust_vendor.resolve()
     if not (vendor / "godot/Cargo.toml").is_file():
@@ -43,8 +49,9 @@ def main():
     if not versions:
         parser.error("No native platform libraries installed")
     for config in versions:
-        import json
         item = json.loads(config.read_text())
+        if (item["platform"], item["arch"]) != ("macos", "arm64"):
+            parser.error("The v0.1.0 release package supports only macOS arm64")
         for name in [item["library"]] + item["dependencies"]:
             if not (config.parent / name).is_file():
                 parser.error(f"Missing packaged dependency: {name}")
@@ -71,14 +78,34 @@ def main():
     for name in ("README.md", "LICENSE", "COPYING.GPLv2"):
         if not (addon / name).is_file():
             parser.error(f"Missing addon document: {name}")
-    for doc in ("protocol.md", "building.md"):
+    for doc in ("protocol.md", "building.md", "client-rebuilding.md"):
         shutil.copy2(ROOT / "docs" / doc, addon / doc)
-    archive(dist / "godot-game-stream-0.1.0.zip", ROOT,
+    shutil.copy2(ROOT / "docs/releases/0.1.0.md", addon / "release-notes.md")
+    archive(dist / "godot-game-stream-0.1.0-macos-arm64.zip", ROOT,
             (p for p in addon.rglob("*") if p.is_file() and p.suffix not in (".import", ".pyc") and p.name != "platform.json"))
+    tracked = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).decode().split("\0")
     archive(dist / "godot-game-stream-0.1.0-source.zip", ROOT,
-            (p for p in ROOT.rglob("*") if p.is_file() and not any(part in SKIP for part in p.relative_to(ROOT).parts)
-             and "bin" not in p.relative_to(ROOT).parts and p.suffix != ".import"))
-    outputs = sorted(dist.glob("*.zip"))
+            (ROOT / name for name in tracked if name and (ROOT / name).is_file()))
+    outputs = [dist / name for name in ("godot-game-stream-0.1.0-macos-arm64.zip",
+               "godot-game-stream-0.1.0-source.zip", "ffmpeg-source.zip", "rust-dependencies.zip")]
+    if args.client:
+        from package_client import package_client
+        package_client(archive)
+        outputs += [dist / "mirctl-0.1.0-macos-arm64.zip", dist / "mirctl-0.1.0-dependencies.zip"]
+    metadata = {
+        "version": "0.1.0", "source_commit": revision,
+        "target": {"os": "macOS", "minimum_os": "26.0", "arch": "arm64",
+                   "godot": "4.6.2", "renderer": "Forward+ / Metal", "codec": "H.264 / TCP"},
+        "tools": {name: subprocess.check_output(command, text=True).strip() for name, command in {
+            "rustc": ["rustc", "--version"], "pug": ["pug", "--version"],
+            "conan": ["conan", "--version"], "xcode": ["xcodebuild", "-version"]}.items()},
+        "signing": "ad-hoc; not Developer ID signed or notarized",
+        "exported_game_validation": "pending",
+        "asset_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in outputs},
+    }
+    (dist / "release-build.json").write_text(json.dumps(metadata, indent=2) + "\n")
+    outputs.append(dist / "release-build.json")
+    outputs.sort()
     (dist / "SHA256SUMS").write_text("".join(f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n" for p in outputs))
     print("Publish all ZIPs together with the corresponding build records and third-party notices.")
     for path in outputs:
