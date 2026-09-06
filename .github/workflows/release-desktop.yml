@@ -24,6 +24,8 @@ jobs:
         platform: ${{ fromJSON(inputs.platform == 'all' && '["linux-x86_64","windows-x86_64"]' || format('["{0}"]', inputs.platform)) }}
     runs-on: ${{ matrix.platform == 'windows-x86_64' && 'windows-2022' || 'ubuntu-22.04' }}
     timeout-minutes: 90
+    env:
+      PYTHONUTF8: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

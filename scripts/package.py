@@ -69,7 +69,7 @@ def main():
     notices.mkdir(parents=True, exist_ok=True)
     inventory = []
     for manifest in sorted(vendor.glob("*/Cargo.toml")):
-        package = tomllib.loads(manifest.read_text())["package"]
+        package = tomllib.loads(manifest.read_text(encoding="utf-8"))["package"]
         inventory.append(f'{package["name"]} {package["version"]}: {package.get("license", "See source license file")}')
         for pattern in ("LICENSE*", "COPYING*", "NOTICE*"):
             for license_file in manifest.parent.glob(pattern):
