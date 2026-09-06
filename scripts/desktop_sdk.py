@@ -105,6 +105,14 @@ def main():
         run(command, cwd=compile_dir, env=env)
         run(["make", f"-j{os.cpu_count() or 2}"], cwd=compile_dir)
         run(["make", "install"], cwd=compile_dir)
+    if windows:
+        # FFmpeg's MSVC install places import libraries alongside its DLLs.
+        # ffmpeg-sys-next looks for those import libraries in FFMPEG_DIR/lib.
+        for component in ("avcodec", "avformat", "avutil", "swscale", "swresample"):
+            library = PREFIX / "bin" / f"{component}.lib"
+            if not library.is_file():
+                raise ValueError(f"Missing MSVC import library: {library}")
+            shutil.copy2(library, PREFIX / "lib" / library.name)
     licenses = PREFIX / "licenses"
     licenses.mkdir(exist_ok=True)
     for name, tree in trees.items():

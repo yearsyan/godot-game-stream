@@ -51,10 +51,12 @@ def package_client(archive, target="macos-arm64"):
         seen.add(ref)
         name = node["name"]
         recipe = Path(node["recipe_folder"])
-        shutil.copytree(recipe, dependencies / "recipes" / name,
+        recipe_name = f'{name}-{node["version"]}-{hashlib.sha256(ref.encode()).hexdigest()[:8]}'
+        shutil.copytree(recipe, dependencies / "recipes" / recipe_name,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         record = {key: node.get(key) for key in (
             "ref", "context", "package_id", "prev", "license", "settings", "options", "conandata")}
+        record["recipe_directory"] = f"recipes/{recipe_name}"
         records.append(record)
         if node["context"] != "host" or name in {"opengl", "xorg"}:
             continue

@@ -63,8 +63,9 @@ def main():
         sys.path.insert(0, str(ROOT / "clients/mirctl/scripts"))
         from build import activate_msvc
         activate_msvc()
-    run([sys.executable, "scripts/desktop_sdk.py"])
     sdk = ROOT / "build/ffmpeg"
+    if os.environ.get("GAME_STREAM_REUSE_SDK") != "true" or not (sdk / "build-info.json").is_file():
+        run([sys.executable, "scripts/desktop_sdk.py"])
     env = os.environ.copy()
     env["FFMPEG_DIR"] = str(sdk)
     env["PKG_CONFIG_PATH"] = str(sdk / "lib/pkgconfig")
