@@ -74,9 +74,9 @@ def main():
         for pattern in ("LICENSE*", "COPYING*", "NOTICE*"):
             for license_file in manifest.parent.glob(pattern):
                 if license_file.is_file():
-                    target = notices / manifest.parent.name / license_file.name
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(license_file, target)
+                    notice_path = notices / manifest.parent.name / license_file.name
+                    notice_path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(license_file, notice_path)
     rust_name = f"rust{suffix}-dependencies.zip"
     ffmpeg_name = f"ffmpeg{suffix}-source.zip"
     (notices / "INDEX.txt").write_text("\n".join(inventory) + f"\n\nMatching source: {rust_name} in this release.\n")
@@ -100,6 +100,8 @@ def main():
     outputs = [dist / name for name in (addon_name, source_name, ffmpeg_name, rust_name)]
     if args.supplemental:
         sdk_sources = ROOT / "build/desktop-sdk/sources"
+        if not (sdk_sources / "build-info.json").is_file():
+            parser.error("Supplemental builds require the desktop SDK source and build records")
         native_archive = dist / f"native{suffix}-dependencies.zip"
         archive(native_archive, sdk_sources, (p for p in sdk_sources.rglob("*") if p.is_file()))
         outputs.append(native_archive)
