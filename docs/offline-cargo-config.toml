@@ -1,0 +1,7 @@
+# Copy to .cargo/config.toml in the source repository root after extracting
+# the matching rust-dependencies.zip alongside that root.
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "rust-vendor"

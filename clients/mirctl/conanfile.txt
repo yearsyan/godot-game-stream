@@ -1,0 +1,67 @@
+[requires]
+ffmpeg/9.0.1
+# ConanCenter uses the sdl package for both SDL2 (2.x) and SDL3 (3.x).
+sdl/3.4.14
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout
+
+[options]
+# Produce one executable with FFmpeg, SDL and the Windows CRT linked statically.
+ffmpeg/*:shared=False
+sdl/*:shared=False
+
+# Raw H.264/HEVC Annex-B and AV1 low-overhead OBU need only libavcodec + libavutil.
+ffmpeg/*:avdevice=False
+ffmpeg/*:avcodec=True
+ffmpeg/*:avformat=False
+ffmpeg/*:swresample=False
+ffmpeg/*:swscale=False
+ffmpeg/*:postproc=False
+ffmpeg/*:avfilter=False
+ffmpeg/*:with_programs=False
+ffmpeg/*:with_asm=True
+
+# Disable unused codec, compression, font, TLS and image-format dependencies.
+ffmpeg/*:with_zlib=False
+ffmpeg/*:with_bzip2=False
+ffmpeg/*:with_lzma=False
+ffmpeg/*:with_libiconv=False
+ffmpeg/*:with_freetype=False
+ffmpeg/*:with_libxml2=False
+ffmpeg/*:with_fontconfig=False
+ffmpeg/*:with_fribidi=False
+ffmpeg/*:with_harfbuzz=False
+ffmpeg/*:with_libjxl=False
+ffmpeg/*:with_openjpeg=False
+ffmpeg/*:with_openh264=False
+ffmpeg/*:with_opus=False
+ffmpeg/*:with_vorbis=False
+ffmpeg/*:with_zeromq=False
+ffmpeg/*:with_sdl=False
+ffmpeg/*:with_libx264=False
+ffmpeg/*:with_libx265=False
+ffmpeg/*:with_libvpx=False
+ffmpeg/*:with_libmp3lame=False
+ffmpeg/*:with_libfdk_aac=False
+ffmpeg/*:with_libwebp=False
+ffmpeg/*:with_ssl=False
+ffmpeg/*:with_soxr=False
+ffmpeg/*:with_vulkan=False
+ffmpeg/*:with_libsvtav1=False
+ffmpeg/*:with_libaom=False
+ffmpeg/*:with_libdav1d=True
+
+# Re-enable only the H.264/HEVC/AV1 decoders and libdav1d wrapper.
+# Native AV1 decoding uses D3D11VA/VideoToolbox hardware acceleration;
+# get_pixel_format returns ENOSYS without usable hardware, so libdav1d handles
+# software AV1 fallback. The client splits AV1 temporal units without a parser.
+# scripts/build.py supplies platform-specific hardware accelerators to avoid
+# configuring Windows-only d3d11va on Linux.
+ffmpeg/*:disable_everything=True
+ffmpeg/*:enable_decoders=h264,hevc,av1,libdav1d
+ffmpeg/*:enable_parsers=h264,hevc

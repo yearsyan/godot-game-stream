@@ -1,0 +1,17 @@
+config_version=5
+
+[application]
+config/name="Godot Game Stream Demo"
+run/main_scene="res://examples/demo.tscn"
+config/features=PackedStringArray("4.6", "Forward Plus")
+config/icon="res://addons/game_stream/icon.svg"
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[editor_plugins]
+enabled=PackedStringArray("res://addons/game_stream/plugin.cfg")
+
+[rendering]
+renderer/rendering_method="forward_plus"

@@ -1,0 +1,59 @@
+# ------------------------------------------------------------------
+# LLVM-based formatting for a pure C project.
+# Usage: clang-format -i <files> or python3 scripts/format.py
+# ------------------------------------------------------------------
+BasedOnStyle: LLVM
+
+# clang-format uses the Cpp parser for both C and C++.
+Language: Cpp
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+ColumnLimit: 100
+
+# Align pointer asterisks with the type.
+PointerAlignment: Left
+
+# Attach opening braces.
+BreakBeforeBraces: Attach
+
+# Keep function return types on the declaration line.
+AlwaysBreakAfterReturnType: None
+
+# Allow only empty function bodies on one line.
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# Wrap arguments and parameters without packing them together.
+BinPackArguments: false
+BinPackParameters: false
+
+# Group includes by category: local headers, uncategorized, FFmpeg/SDL, system.
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"'
+    Priority: 1
+  - Regex: '^<(avcodec|avformat|avutil|avfilter|avdevice|swscale|swresample)/'
+    Priority: 3
+  - Regex: '^<SDL3/'
+    Priority: 3
+  - Regex: '^<'
+    Priority: 4
+  - Regex: '.*'
+    Priority: 2
+
+SortIncludes: CaseSensitive
+
+# Keep at most one consecutive empty line.
+MaxEmptyLinesToKeep: 1
+
+# Reflow comments to fit the column limit.
+ReflowComments: true
+
+# Align wrapped bracket contents without aligning consecutive declarations.
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false

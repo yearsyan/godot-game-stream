@@ -1,0 +1,46 @@
+name: Checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  distribution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m unittest discover -s tests -v
+  native:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: sudo apt-get update && sudo apt-get install -y clang libclang-dev nasm pkg-config
+      - name: Prepare LGPL FFmpeg 9 SDK
+        run: |
+          curl --fail --location https://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz --output "$RUNNER_TEMP/ffmpeg.tar.xz"
+          printf '%s  %s\n' cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635 "$RUNNER_TEMP/ffmpeg.tar.xz" | sha256sum --check
+          tar -xf "$RUNNER_TEMP/ffmpeg.tar.xz" -C "$RUNNER_TEMP"
+          python3 scripts/ffmpeg_sdk.py --source "$RUNNER_TEMP/ffmpeg-9.0.1"
+      - name: Native unit tests and lint
+        run: |
+          export FFMPEG_DIR="$GITHUB_WORKSPACE/build/ffmpeg"
+          export PKG_CONFIG_PATH="$FFMPEG_DIR/lib/pkgconfig"
+          export LD_LIBRARY_PATH="$FFMPEG_DIR/lib"
+          cargo fmt --manifest-path native/game_stream/Cargo.toml --check
+          cargo test --locked --release --manifest-path native/game_stream/Cargo.toml
+          cargo clippy --locked --release --all-targets --manifest-path native/game_stream/Cargo.toml -- -D warnings
+  client:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install conan
+      - run: conan profile detect
+      - run: python3 clients/mirctl/scripts/build.py
+      - run: ctest --test-dir clients/mirctl/build/app/Release --output-on-failure

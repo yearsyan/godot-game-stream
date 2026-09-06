@@ -1,0 +1,16 @@
+.DS_Store
+/.godot_rust_home/
+**/.godot/
+**/__pycache__/
+**/*.py[cod]
+**/target/
+**/build/
+**/dist/
+**/.cargo/
+**/project-overwrite.pug.json
+**/export_presets.cfg
+/addons/game_stream/bin/
+/addons/game_stream/game_stream.gdextension
+/addons/game_stream/THIRD_PARTY/
+*.import
+CMakeUserPresets.json

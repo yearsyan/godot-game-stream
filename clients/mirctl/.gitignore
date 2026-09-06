@@ -1,0 +1,41 @@
+# Build outputs
+build/
+cmake-build-*/
+dist/
+CMakeUserPresets.json
+
+# Conan
+conan_cache/
+.conan2/
+.tools/
+**/conaninfo.txt
+**/conanbuildinfo.*
+**/conanbuild.*
+**/conanrun.*
+**/conanenv.*
+**/deactivate_conanbuild.*
+**/environment.*
+**/generators/
+
+# IDE
+.vscode/
+.idea/
+*.user
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Compiler and linker outputs
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Python
+__pycache__/
+*.py[cod]
