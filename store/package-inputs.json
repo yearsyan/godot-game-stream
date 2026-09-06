@@ -1,0 +1,109 @@
+{
+  "version": "0.1.0",
+  "release_url": "https://github.com/yearsyan/godot-game-stream/releases/tag/v0.1.0",
+  "platforms": [
+    {
+      "platform": "macos-arm64",
+      "source_commit": "2ecbc96caecc287f202228ef424d4961a52cde75",
+      "assets": [
+        {
+          "name": "godot-game-stream-0.1.0-macos-arm64.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/godot-game-stream-0.1.0-macos-arm64.zip",
+          "sha256": "0f5f21c0b483ffa7044ecc47cce5cc5e247ce7f17487e4e44c6890945c17190f"
+        },
+        {
+          "name": "godot-game-stream-0.1.0-source.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/godot-game-stream-0.1.0-source.zip",
+          "sha256": "6637f51cf06ad8684a1eab2954d87a1160e81936eb219e3135d935f4fa91a220"
+        },
+        {
+          "name": "ffmpeg-source.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/ffmpeg-source.zip",
+          "sha256": "2a91319091f65079e0c712e8908bd374f709cd7101e3837193e77e35c09c609a"
+        },
+        {
+          "name": "rust-dependencies.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/rust-dependencies.zip",
+          "sha256": "7aff14f4caa117c00cfa076992fb5f3e73568ef8bbf21aa62b961b7b0023ea4e"
+        },
+        {
+          "name": "release-build.json",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/release-build.json",
+          "sha256": "e18a63151890ec1c47009f9bfc62de3c1ee309395650128ccb5312e07a3def25"
+        }
+      ]
+    },
+    {
+      "platform": "windows-x86_64",
+      "source_commit": "40ff5179f87b9b2d887c1f6feb08871e7791d592",
+      "assets": [
+        {
+          "name": "godot-game-stream-0.1.0-windows-x86_64.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/godot-game-stream-0.1.0-windows-x86_64.zip",
+          "sha256": "b730141ee1679a7a86b314b1a82b38af1afb9368d7bc3f0efea14f638aaf8df8"
+        },
+        {
+          "name": "godot-game-stream-0.1.0-windows-x86_64-source.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/godot-game-stream-0.1.0-windows-x86_64-source.zip",
+          "sha256": "db155416d1dad9fecb4aa7e68dcd1bbbad5a70b464f872ed3959b8699e21b57e"
+        },
+        {
+          "name": "ffmpeg-windows-x86_64-source.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/ffmpeg-windows-x86_64-source.zip",
+          "sha256": "b6914ed2c518f22b28dcb123046aa3cd0057023b5fad48d85b7e689796d7740e"
+        },
+        {
+          "name": "rust-windows-x86_64-dependencies.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/rust-windows-x86_64-dependencies.zip",
+          "sha256": "e4ef5c4e6838c07c196377b68414d29317370cc498e37982e749792b57ea3250"
+        },
+        {
+          "name": "release-build-windows-x86_64.json",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/release-build-windows-x86_64.json",
+          "sha256": "13907430ce90e2c757777404cec738e8f7713f841118584dee088ac8d169dd81"
+        },
+        {
+          "name": "native-windows-x86_64-dependencies.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/native-windows-x86_64-dependencies.zip",
+          "sha256": "10bcb5995d10612b60263799be92b43c99f2113ee0d9cd48363d11e52b9b7e3d"
+        }
+      ]
+    },
+    {
+      "platform": "linux-x86_64",
+      "source_commit": "d51fbf283f8022e62c1940849d82be7ba2dfd786",
+      "assets": [
+        {
+          "name": "godot-game-stream-0.1.0-linux-x86_64.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/godot-game-stream-0.1.0-linux-x86_64.zip",
+          "sha256": "f4b3927e574fafaa5484429857964a681c8bd4777d5e533381e3a52eadd0497e"
+        },
+        {
+          "name": "godot-game-stream-0.1.0-linux-x86_64-source.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/godot-game-stream-0.1.0-linux-x86_64-source.zip",
+          "sha256": "af238c7c524049b758e18afd5d37a99ace675416ffa1774ca4c60e4e6c9dd864"
+        },
+        {
+          "name": "ffmpeg-linux-x86_64-source.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/ffmpeg-linux-x86_64-source.zip",
+          "sha256": "9d7012acbde7089c76790dc153186a27a8ee55050fb0ed6bda5e01061d042d56"
+        },
+        {
+          "name": "rust-linux-x86_64-dependencies.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/rust-linux-x86_64-dependencies.zip",
+          "sha256": "1d642c7a655170f522eb9281878997efe6a1c0640f0799451a4a6d375af2c226"
+        },
+        {
+          "name": "release-build-linux-x86_64.json",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/release-build-linux-x86_64.json",
+          "sha256": "e2d28f5f48fa195d098f79a0515a6feb6ad668112cc27686203c20f00408d8fb"
+        },
+        {
+          "name": "native-linux-x86_64-dependencies.zip",
+          "url": "https://github.com/yearsyan/godot-game-stream/releases/download/v0.1.0/native-linux-x86_64-dependencies.zip",
+          "sha256": "441481535c1dfc3f08d58b0f1be856723c53d5e33439bcc44b8e4d1a5c318622"
+        }
+      ]
+    }
+  ]
+}

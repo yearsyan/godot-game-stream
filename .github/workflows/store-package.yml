@@ -1,0 +1,33 @@
+name: Store package validation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  export:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Linux runtime libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libva2 libva-drm2 libdrm2 libgl1 libx11-6 libxcursor1 libxi6 libxrandr2 libxinerama1 libfontconfig1 libasound2
+      - name: Validate fresh installation and relocated release export
+        run: python scripts/validate_store.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: store-validation-${{ runner.os }}
+          path: |
+            build/store-validation/*.log
+            build/store-validation/result.json
+            dist/store/*
