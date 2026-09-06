@@ -10,6 +10,10 @@ on:
           - all
           - linux-x86_64
           - windows-x86_64
+      diagnostics_only:
+        description: Inspect cached native dependency configuration logs
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -55,11 +59,23 @@ jobs:
             build/release-tools
             native/game_stream/target
       - name: Build and validate native binaries
+        if: ${{ !inputs.diagnostics_only }}
         env:
           MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
           CONAN_NON_INTERACTIVE: '1'
           GAME_STREAM_REUSE_SDK: ${{ steps.build-cache.outputs.cache-hit }}
         run: python scripts/desktop_release.py
+      - name: Inspect cached dependency configuration
+        if: inputs.diagnostics_only
+        shell: python
+        run: |
+          from pathlib import Path
+          for path in sorted((Path.home() / '.conan2/p/b').glob('ffmpe*/b/**/config.log')):
+              print(str(path), flush=True)
+              print(path.read_text(errors='replace')[-18000:], flush=True)
+          for path in sorted((Path.home() / '.conan2/p/b').glob('ffmpe*/b/**/dav1d.pc')):
+              print(str(path), flush=True)
+              print(path.read_text(errors='replace'), flush=True)
       - uses: actions/cache/save@v4
         if: always() && steps.build-cache.outputs.cache-primary-key != '' && steps.build-cache.outputs.cache-hit != 'true'
         with:
