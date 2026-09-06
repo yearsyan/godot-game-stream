@@ -1,6 +1,14 @@
 # Rebuilding or relinking mirctl 0.1.0
 
-This archive accompanies `mirctl-0.1.0-macos-arm64.zip`. First-party C source is
+This archive accompanies the matching mirctl binary ZIP. For Windows/Linux,
+use `godot-game-stream-0.1.0-<platform>-source.zip` and
+`mirctl-0.1.0-<platform>-dependencies.zip`. The included `<platform>.profile`
+records the native compiler and settings. Use Visual Studio 2022 C++ tools on
+Windows or GCC on Ubuntu 22.04 for Linux, plus Python 3.12 and Conan 2.28.1.
+The build command below works on all three platforms; replace the profile name
+and set `CONAN_HOME` using your shell's environment syntax.
+
+For macOS, first-party C source is
 in `godot-game-stream-0.1.0-source.zip` from the same release. FFmpeg, SDL3 and
 dav1d retain the licenses in `licenses/`; their original source archives are in
 `sources/`. Source archive checksums and exact Conan revisions/options are in
@@ -39,6 +47,9 @@ with dependency paths replaced by `$DEPENDENCIES/static-libraries/<name>`.
 
 Recreate the `CMakeFiles/` layout from `objects/`, place `libmirctl_core.a` in the
 working directory and adapt the command to your local directories and Xcode SDK.
+Linux uses the same `.o`/`.a` layout. Windows uses `.obj`, response files and
+`mirctl_core.lib`; preserve the recorded CMake target directory layout and adapt
+`original-link-command.txt` and response file paths to your SDK and libraries.
 You can replace any dependency archive with an ABI-compatible modified build
 before linking. A newly linked macOS executable may need a new ad-hoc signature:
 

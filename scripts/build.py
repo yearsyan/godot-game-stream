@@ -44,7 +44,7 @@ def inspect_sdk(sdk, system):
         for component in COMPONENTS:
             prefix = component + "-" if system == "windows" else "lib" + component + "."
             path = next(p for name, p in sorted(libraries.items()) if name.startswith(prefix))
-            lib = ctypes.CDLL(str(path), mode=ctypes.RTLD_GLOBAL)
+            lib = ctypes.CDLL(str(path), mode=getattr(ctypes, "RTLD_GLOBAL", 0))
             loaded.append(lib)
             license_fn = getattr(lib, component + "_license")
             license_fn.restype = ctypes.c_char_p

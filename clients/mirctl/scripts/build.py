@@ -198,6 +198,10 @@ def main() -> int:
                     "-o", "sdl/*:alsa=False",
                     "-o", "sdl/*:pulseaudio=False",
                     "-o", "sdl/*:sndio=False",
+                    "-o", "sdl/*:wayland=False",
+                    "-o", "sdl/*:dbus=False",
+                    "-o", "sdl/*:libudev=False",
+                    "-o", "sdl/*:opengles=False",
                 ]
             )
         run(conan_command)

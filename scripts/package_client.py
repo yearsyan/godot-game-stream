@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LGPL-2.1-or-later
-"""Collect the macOS client and its exact Conan dependency materials."""
+"""Collect the native client and its exact Conan dependency materials."""
 import hashlib
 import json
 from pathlib import Path
@@ -12,14 +12,16 @@ ROOT = Path(__file__).resolve().parents[1]
 CLIENT = ROOT / "clients/mirctl"
 
 
-def package_client(archive):
+def package_client(archive, target="macos-arm64"):
     graph_path = CLIENT / "build/conan-graph.json"
     graph = json.loads(graph_path.read_text())["graph"]
     nodes = list(graph["nodes"].values())
     settings = nodes[0]["settings"]
-    if settings.get("os") != "Macos" or settings.get("arch") != "armv8":
-        raise ValueError("The v0.1.0 client package targets macOS arm64 only")
-    executable = CLIENT / "dist/mirctl"
+    expected = {"macos-arm64": ("Macos", "armv8"), "windows-x86_64": ("Windows", "x86_64"),
+                "linux-x86_64": ("Linux", "x86_64")}[target]
+    if (settings.get("os"), settings.get("arch")) != expected:
+        raise ValueError(f"Conan settings do not match {target}")
+    executable = CLIENT / "dist" / ("mirctl.exe" if settings["os"] == "Windows" else "mirctl")
     version = subprocess.check_output([str(executable), "--version"], text=True)
     if "FFmpeg license: LGPL" not in version:
         raise ValueError("The client must report an LGPL FFmpeg build")
@@ -27,15 +29,16 @@ def package_client(archive):
     work = ROOT / "build/client-release"
     if work.exists():
         shutil.rmtree(work)
-    binary = work / "mirctl-0.1.0-macos-arm64"
+    binary = work / f"mirctl-0.1.0-{target}"
     dependencies = work / "mirctl-dependencies"
     binary.mkdir(parents=True)
     dependencies.mkdir()
-    shutil.copy2(executable, binary / "mirctl")
+    shutil.copy2(executable, binary / executable.name)
     for name in ("LICENSE", "COPYING.GPLv2", "THIRD_PARTY.md"):
         shutil.copy2(CLIENT / name, binary / name)
     shutil.copy2(ROOT / "docs/client-installation.md", binary / "README.md")
     shutil.copy2(ROOT / "docs/releases/0.1.0.md", binary / "release-notes.md")
+    shutil.copy2(ROOT / "docs/desktop-releases.md", binary / "desktop-releases.md")
     shutil.copy2(ROOT / "docs/client-rebuilding.md", dependencies / "README.md")
     shutil.copy2(CLIENT / "build/conan.lock", dependencies / "conan.lock")
 
@@ -53,7 +56,7 @@ def package_client(archive):
         record = {key: node.get(key) for key in (
             "ref", "context", "package_id", "prev", "license", "settings", "options", "conandata")}
         records.append(record)
-        if node["context"] != "host" or name == "opengl":
+        if node["context"] != "host" or name in {"opengl", "xorg"}:
             continue
         if name not in {"ffmpeg", "sdl", "dav1d"}:
             raise ValueError(f"Unreviewed client runtime dependency: {ref}")
@@ -78,19 +81,21 @@ def package_client(archive):
         sdk = dependencies / "static-libraries" / name
         shutil.copytree(package / "include", sdk / "include")
         (sdk / "lib").mkdir()
-        for library in (package / "lib").glob("*.a"):
-            shutil.copy2(library, sdk / "lib" / library.name)
+        for pattern in ("*.a", "*.lib"):
+            for library in (package / "lib").glob(pattern):
+                shutil.copy2(library, sdk / "lib" / library.name)
 
     profile = "[settings]\n" + "".join(f"{key}={value}\n" for key, value in settings.items())
-    (dependencies / "macos-arm64.profile").write_text(profile)
+    (dependencies / f"{target}.profile").write_text(profile)
     (dependencies / "dependency-build.json").write_text(json.dumps(records, indent=2) + "\n")
     # Consumers can relink the original application objects with replacement libraries.
     objects = CLIENT / "build/app/Release/CMakeFiles"
-    for target in ("mirctl.dir", "mirctl_core.dir"):
-        for obj in (objects / target).rglob("*.o"):
-            dest = dependencies / "objects" / obj.relative_to(objects)
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(obj, dest)
+    for cmake_target in ("mirctl.dir", "mirctl_core.dir"):
+        for pattern in ("*.o", "*.obj", "*.res", "*.rsp"):
+            for obj in (objects / cmake_target).rglob(pattern):
+                dest = dependencies / "objects" / obj.relative_to(objects)
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(obj, dest)
     link_file = objects / "mirctl.dir/link.txt"
     link = link_file.read_text()
     for node in nodes:
@@ -98,9 +103,11 @@ def package_client(archive):
             link = link.replace(node["package_folder"], f'$DEPENDENCIES/static-libraries/{node["name"]}')
     link = link.replace(str(CLIENT), "$CLIENT_SOURCE")
     (dependencies / "original-link-command.txt").write_text(link)
-    shutil.copy2(CLIENT / "build/app/Release/libmirctl_core.a", dependencies / "objects/libmirctl_core.a")
+    core = "mirctl_core.lib" if settings["os"] == "Windows" else "libmirctl_core.a"
+    shutil.copy2(CLIENT / "build/app/Release" / core, dependencies / "objects" / core)
     (binary / "build-info.txt").write_text(version)
-    archive(ROOT / "dist/mirctl-0.1.0-macos-arm64.zip", binary,
+    archive(ROOT / f"dist/mirctl-0.1.0-{target}.zip", binary,
             (p for p in binary.rglob("*") if p.is_file()))
-    archive(ROOT / "dist/mirctl-0.1.0-dependencies.zip", work,
+    suffix = "" if target == "macos-arm64" else f"-{target}"
+    archive(ROOT / f"dist/mirctl-0.1.0{suffix}-dependencies.zip", work,
             (p for p in dependencies.rglob("*") if p.is_file()))

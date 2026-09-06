@@ -41,7 +41,9 @@ python3 tests/smoke_editor.py --godot /path/to/official/godot
 
 ## Remaining release validation
 
-- Windows/Linux builds and driver combinations have not been validated here.
+- The maintainer reports Windows/Linux streaming validation in GachaGameProducer.
+  Supplemental standalone builds have separate native CI and loader checks;
+  hosted CI does not exercise the hardware encoder. See [desktop releases](desktop-releases.md).
 - Exported-game runtime dependency placement and public macOS signing/notarization
   still need release validation. The current addon build is locally ad-hoc signed.
 - The v0.1.0 release packager collects client Conan source/license/rebuild

@@ -2,6 +2,12 @@
 
 Initial standalone release of the LGPL-2.1-or-later Godot addon and mirctl client.
 
+Windows x86_64 and Linux x86_64 addon/client packages are available as supplemental
+release assets. Their source commit, dependency requirements and validation scope
+are recorded in `release-build-<platform>.json` and `desktop-releases.md`. The
+maintainer has validated both platforms in GachaGameProducer. The original macOS
+assets and tag are unchanged; the configuration table below describes those assets.
+
 ## Supported configuration
 
 | Component | Release target |
@@ -16,9 +22,13 @@ Initial standalone release of the LGPL-2.1-or-later Godot addon and mirctl clien
 
 The binary deployment target is macOS 26.0 because its FFmpeg and client
 dependencies were built with that minimum. Older macOS releases require a
-separate dependency rebuild and validation. Windows, Linux, Intel Macs, other
+separate dependency rebuild and validation. Intel Macs, other
 Godot versions, the Mobile renderer, HEVC/AV1 and UDP are outside this release's
 validated scope, even where the source contains implementations.
+
+For Windows/Linux, download `godot-game-stream-0.1.0-<platform>.zip` and
+`mirctl-0.1.0-<platform>.zip`, where `<platform>` is `windows-x86_64` or `linux-x86_64`.
+Use the corresponding platform-specific source and dependency archives when rebuilding.
 
 ## Downloads
 

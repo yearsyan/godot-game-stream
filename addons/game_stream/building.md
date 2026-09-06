@@ -19,7 +19,10 @@ signature before using it for a public release. The helper uses system
 VideoToolbox and enables no external codec library, GPL code or nonfree code.
 It records its configure command in `build/ffmpeg/build-info.json`.
 
-On Windows/Linux, supply an LGPL FFmpeg 9 SDK with the hardware wrappers needed
+On Windows/Linux, `python scripts/desktop_sdk.py` builds a checksum-pinned LGPL
+FFmpeg 9.0.1 shared SDK with NVENC, AMF and QSV. See [desktop releases](desktop-releases.md)
+for prerequisites and the complete `scripts/desktop_release.py` build/check/package flow.
+Alternatively, supply an LGPL FFmpeg 9 SDK with the hardware wrappers needed
 for the target GPU (NVENC, AMF or QSV). A wrapper being compiled in does not prove
 that a particular device or driver can open an encoder. The POSIX SDK helper can
 also prepare Linux libraries for unit tests; add the required hardware SDK headers
@@ -100,8 +103,10 @@ cargo vendor --locked --manifest-path native/game_stream/Cargo.toml build/rust-v
 python3 scripts/package.py --ffmpeg-source /exact/source/used/for/sdk --client
 ```
 
-Commit the final source before packaging. Version 0.1.0 packages macOS arm64
-only and rejects other platform manifests. It produces an addon ZIP, a client
+Commit the final source before packaging. The original v0.1.0 package names are
+reserved for macOS arm64. Use `--supplemental` for Windows/Linux builds so their
+source and dependency archives do not replace existing release materials.
+Package one platform per invocation. It produces an addon ZIP, a client
 ZIP, first-party/FFmpeg/Rust/client-dependency source materials, a build record
 and checksums under `dist/`. Publish the six ZIPs, `release-build.json` and
 `SHA256SUMS` together. The first-party source ZIP includes only tracked files

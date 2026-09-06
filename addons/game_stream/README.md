@@ -1,11 +1,13 @@
 # Godot Game Stream
 
-LGPL-2.1-or-later · v0.1.0 · macOS arm64
+LGPL-2.1-or-later · v0.1.0 · Windows x86_64 / Linux x86_64 / macOS arm64
 
-This binary release targets macOS 26.0+, Godot 4.6.2 standard precision and
-Forward+ with Metal. H.264 over TCP with VideoToolbox encoding is the supported
-configuration. The release was tested on macOS 26.6.2. Other platforms, renderers,
-Godot versions and codecs are experimental. See `release-notes.md`.
+Use the archive matching your operating system. The addon targets Godot 4.6.2
+standard precision and Forward+. Windows/Linux use NVENC, AMF or QSV; macOS
+26.0+ arm64 uses VideoToolbox. H.264 over TCP is the default. Windows/Linux
+streaming was validated by the maintainer in GachaGameProducer; the standalone
+desktop artifacts undergo native builds, tests and dependency loading checks.
+See `release-notes.md` and `desktop-releases.md` for requirements and scope.
 
 Install this entire folder under `addons/`, enable **Godot Game Stream** in
 Project Settings → Plugins, and add a **GameStreamHost** node to a scene.
