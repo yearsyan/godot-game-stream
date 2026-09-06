@@ -144,6 +144,9 @@ def main() -> int:
     build_type = "Release" if args.build_type == "release" else "Debug"
     msvc_profile = None
     if sys.platform == "win32":
+        # Conan supplies its own pkg-config paths. Inherited Windows paths (for
+        # example from setup-python) interfere with MSYS2 path-list conversion.
+        os.environ.pop("PKG_CONFIG_PATH", None)
         msvc_profile = write_ffmpeg_msvc_profile(activate_msvc())
 
     if not args.skip_conan:

@@ -52,6 +52,7 @@ jobs:
         id: build-cache
         with:
           key: desktop-${{ matrix.platform }}-v1-${{ hashFiles('scripts/desktop_sdk.py', 'clients/mirctl/conanfile.txt', 'clients/mirctl/scripts/build.py', 'native/game_stream/Cargo.lock') }}
+          restore-keys: desktop-${{ matrix.platform }}-v1-
           path: |
             ~/.conan2
             build/ffmpeg

@@ -83,7 +83,15 @@ def main():
     run([sys.executable, "tests/check_desktop_runtime.py"], env=os.environ.copy())
     run([sys.executable, "tests/smoke_editor.py", "--godot", str(godot)])
     run(["conan", "profile", "detect", "--force"])
-    run([sys.executable, "clients/mirctl/scripts/build.py"])
+    try:
+        run([sys.executable, "clients/mirctl/scripts/build.py"])
+    except subprocess.CalledProcessError:
+        logs = list((Path.home() / ".conan2/p/b").glob("ffmpe*/b/**/config.log"))
+        if logs:
+            latest = max(logs, key=lambda p: p.stat().st_mtime)
+            print(f"FFmpeg dependency configuration log: {latest}", flush=True)
+            print(latest.read_text(errors="replace")[-10000:], flush=True)
+        raise
     run(["ctest", "--test-dir", "clients/mirctl/build/app/Release", "--output-on-failure"])
     run(["cargo", "vendor", "--locked", *crate, "build/rust-vendor"])
     source = json.loads((sdk / "build-info.json").read_text())["source_tree"]
